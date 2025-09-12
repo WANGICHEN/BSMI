@@ -51,10 +51,11 @@ if submitted:
     #             'report_no':'report_no', 'application_no':'application_no', 'Y': Y, 'M': M, 'D': D, 'review_date':'review_date',
     #             'r_str':'r_str', 'test_standard':'test_standard'}
 
-    zip_buffer = writein.run_BSMI_doc("C:/Users/janice/Desktop/doc/BSMI_doc/BSMI用印文件/", information)
+    zip_buffer = writein.run_BSMI_doc("BSMI用印文件/", information)
 
     st.download_button(
         label="下載壓縮檔",
         data=zip_buffer,
         file_name="results.zip",
+
         mime="application/zip")
