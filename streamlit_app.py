@@ -26,7 +26,7 @@ with st.form("company_form"):  # 表單名稱可自訂
     review_date = st.date_input("預審日期")
 
     # 其他欄位
-    r_str = st.text_input("R 字軌")
+    r_str = st.text_input("R 字軌 (申請者識別號碼)")
     
     test_standard = st.selectbox(
         '測試標準',
@@ -63,6 +63,7 @@ if submitted:
         file_name="results.zip",
 
         mime="application/zip")
+
 
 
 
