@@ -42,7 +42,7 @@ with st.form("company_form"):  # 表單名稱可自訂
 if submitted:
     Y, M, D = time_sep(date)
     information = {'co_name':co_name, 'co_addr':co_addr, 'co_tel':co_tel, 'co_id':co_id, 'co_represent':co_represent,
-                   'product_name':product_name, 'main':main, 'series':series,
+                   'product_name':product_name, 'main':main, 'series':', ' + series,
                    'report_no':report_no, 'application_no':application_no, 'Y': Y, 'M': M, 'D': D, 'review_date':review_date,
                    'r_str':r_str, 'test_standard':test_standard}
 
@@ -59,5 +59,6 @@ if submitted:
         file_name="results.zip",
 
         mime="application/zip")
+
 
 
