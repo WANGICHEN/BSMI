@@ -31,7 +31,7 @@ with st.form("company_form"):  # 表單名稱可自訂
     test_standard = st.selectbox(
         '測試標準',
         ("CNS 14336-1 資訊技術設備安全通則99年版",
-         "CNS 14336-2 CNS 15598-1 影音、資訊及通訊技術設備 -第 1 部：安全要求109年6月30日版",
+         "CNS 15598-1 影音、資訊及通訊技術設備 -第 1 部：安全要求109年6月30日版",
          "CNS 15425-1(104年版) 電動機車充電系統安全一般規範"),
     )
 
@@ -59,4 +59,5 @@ if submitted:
         file_name="results.zip",
 
         mime="application/zip")
+
 
