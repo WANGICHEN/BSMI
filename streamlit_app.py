@@ -34,6 +34,10 @@ with st.form("company_form"):  # 表單名稱可自訂
          "CNS 15598-1 影音、資訊及通訊技術設備 -第 1 部：安全要求109年6月30日版",
          "CNS 15425-1(104年版) 電動機車充電系統安全一般規範"),
     )
+    unit1 = st.text_input("單元一")
+    unit2 = st.text_input("單元二")
+    unit3 = st.text_input("單元三")
+    unit4 = st.text_input("單元四")
 
 
     # 提交按鈕（必須放在 form 裡面）
@@ -44,7 +48,7 @@ if submitted:
     information = {'co_name':co_name, 'co_addr':co_addr, 'co_tel':co_tel, 'co_id':co_id, 'co_represent':co_represent,
                    'product_name':product_name, 'main':main, 'series':', ' + series,
                    'report_no':report_no, 'application_no':application_no, 'Y': Y, 'M': M, 'D': D, 'review_date':review_date,
-                   'r_str':r_str, 'test_standard':test_standard}
+                   'r_str':r_str, 'test_standard':test_standard, 'unit1': unit1, 'unit2': unit2, 'unit3': unit3, 'unit4': unit4}
 
     # information = {'co_name':'name', 'co_addr':'addr', 'co_tel':'tel', 'co_id':'id', 'co_represent':'represent',
     #             'product_name':'product_name', 'main':'main', 'series':'series',
@@ -59,6 +63,7 @@ if submitted:
         file_name="results.zip",
 
         mime="application/zip")
+
 
 
 
