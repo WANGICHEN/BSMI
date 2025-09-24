@@ -10,7 +10,7 @@ from docx.shared import RGBColor
 
 def write_doc(doc, info):
 
-    # for para in doc.paragraphs:
+    for para in doc.paragraphs:
     #     full_text = ''.join(run.text for run in para.runs)
     #     replaced = False
     #     for key, value in info.items():
@@ -24,12 +24,12 @@ def write_doc(doc, info):
         #         run.text = '' 
         #         # 只用一個 run 填回去 
         #     para.runs[0].text = full_text
-    for run in para.runs:
-        for key, value in info.items():
-            placeholder = f'{{{key}}}'
-            if placeholder in run.text:
-                run.text = run.text.replace(placeholder, str(value))
-                run.font.color.rgb = RGBColor(0, 0, 0)  # 可強制黑色
+        for run in para.runs:
+            for key, value in info.items():
+                placeholder = f'{{{key}}}'
+                if placeholder in run.text:
+                    run.text = run.text.replace(placeholder, str(value))
+                    run.font.color.rgb = RGBColor(0, 0, 0)  # 可強制黑色
     
     # 處理所有表格
     for table in doc.tables:
@@ -159,6 +159,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
