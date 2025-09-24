@@ -22,11 +22,22 @@ def write_doc(doc, info):
             # 清空原有 runs
             for run in para.runs:
                 run.text = ''
-            # 只用一個 run 填回去
-            para.runs[0].text = full_text
-            # ★ 關鍵：把原樣式複製回來
-            if style_ref._element.rPr is not None:
-                para.runs[0]._element.rPr = style_ref._element.rPr  
+            # # 只用一個 run 填回去
+            # para.runs[0].text = full_text
+            # # ★ 關鍵：把原樣式複製回來
+            # if style_ref._element.rPr is not None:
+            #     para.runs[0]._element.rPr = style_ref._element.rPr  
+
+            # 若沒有 run，先建一個
+            if not para.runs:
+                target = para.add_run(full_text)
+            else:
+                para.runs[0].text = full_text
+                target = para.runs[0]
+            
+            # ★ 關鍵：用 deepcopy 複製 rPr，避免 lxml parent 衝突
+            if style_rPr is not None:
+                target._element.rPr = deepcopy(style_rPr)
 
     # 處理所有表格
     for table in doc.tables:
@@ -156,6 +167,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
