@@ -65,7 +65,7 @@ def run_BSMI_doc(info):
     
     for f_name, f in fs:
         information = info.copy()
-        if f_name in ["00_08.docx"]:
+        if f_name in ["00_08.docx", "外箱標示.docx"]:
             information["series"] = ", " + information["series"]
         download_url = f + ("&download=1" if "?" in f else "?download=1")
             
@@ -83,6 +83,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
