@@ -7,110 +7,114 @@ import requests
 from io import BytesIO 
 from docx.shared import RGBColor
 
-# def write_doc(doc, info):
+def write_doc(doc, info):
 
-#     for para in doc.paragraphs:
-#         full_text = ''.join(run.text for run in para.runs)
-#         replaced = False
-#         for key, value in info.items():
-#             placeholder = f'{{{key}}}'
-#             if placeholder in full_text:
-#                 full_text = full_text.replace(placeholder, str(value))
-#                 replaced = True
-#         if replaced:
-#             # 清空原有 runs
-#             for run in para.runs:
-#                 run.text = ''
-#             # 只用一個 run 填回去
-#             para.runs[0].text = full_text
+    for para in doc.paragraphs:
+        full_text = ''.join(run.text for run in para.runs)
+        replaced = False
+        for key, value in info.items():
+            placeholder = f'{{{key}}}'
+            if placeholder in full_text:
+                full_text = full_text.replace(placeholder, str(value))
+                replaced = True
+        if replaced:
+            style_ref = para.runs[0]
+            # 清空原有 runs
+            for run in para.runs:
+                run.text = ''
+            # 只用一個 run 填回去
+            para.runs[0].text = full_text
+            # ★ 關鍵：把原樣式複製回來
+            if style_ref._element.rPr is not None:
+                para.runs[0]._element.rPr = style_ref._element.rPr  
 
-#     # 處理所有表格
-#     for table in doc.tables:
-#         for row in table.rows:
-#             for cell in row.cells:
-#                 for para in cell.paragraphs:
-#                     full_text = ''.join(run.text for run in para.runs)
-#                     replaced = False
-#                     for key, value in info.items():
-#                         placeholder = f'{{{key}}}'
-#                         if placeholder in full_text:
-#                             full_text = full_text.replace(placeholder, str(value))
-#                             replaced = True
-#                     if replaced:
-#                         for run in para.runs:
-#                             run.text = ''
-#                             run.font.color.rgb = RGBColor(0, 0, 0)
-#                         para.runs[0].text = full_text
-#     return doc
-
-from docx.shared import RGBColor
-
-BLACK = RGBColor(0, 0, 0)
-
-def _all_paras(doc):
-    for p in doc.paragraphs: yield p
-    for t in doc.tables:
-        for r in t.rows:
-            for c in r.cells:
-                for p in c.paragraphs: yield p
-                for tt in c.tables:
-                    for rr in tt.rows:
-                        for cc in rr.cells:
-                            for p in cc.paragraphs: yield p
-
-def _copy_style(dst, src):
-    if src._element.rPr is not None:
-        dst._element.rPr = src._element.rPr
-
-def write_doc(doc, mapping, force_black=True):
-    # mapping 例： {"{name}": "王小姐", "{date}": "2025/09/24"}
-    items = sorted(mapping.items(), key=lambda kv: len(kv[0]), reverse=True)
-    for para in _all_paras(doc):
-        runs = list(para.runs)
-        if not runs: continue
-        spans, s = [], 0
-        full = "".join(r.text for r in runs)
-        if not full: continue
-        for r in runs:
-            e = s + len(r.text); spans.append((s, e, r)); s = e
-
-        # 找所有匹配（避免重疊）
-        occ = [False]*len(full); hits = []
-        for ph, val in items:
-            start = 0; L = len(ph)
-            while True:
-                i = full.find(ph, start)
-                if i < 0: break
-                j = i + L
-                if all(not occ[k] for k in range(i, j)):
-                    hits.append((i, j, str(val)))
-                    for k in range(i, j): occ[k] = True
-                start = j
-        if not hits: continue
-        hits.sort()
-
-        # 清空並重建
-        for r in para.runs: r.text = ""
-        while para.runs: para._element.remove(para.runs[0]._element)
-
-        cur = 0; h = 0
-        while cur < len(full):
-            if h < len(hits) and cur == hits[h][0]:
-                a,b,val = hits[h]
-                # 取樣式來源：placeholder 起點所屬 run
-                base = next(r for (s,e,r) in spans if s < a < e or s == a)
-                nr = para.add_run(val); _copy_style(nr, base)
-                if force_black: nr.font.color.rgb = BLACK
-                cur = b; h += 1
-            else:
-                nxt = hits[h][0] if h < len(hits) else len(full)
-                for s,e,r0 in spans:
-                    if e <= cur or s >= nxt: continue
-                    piece = full[max(s,cur):min(e,nxt)]
-                    if piece:
-                        nr = para.add_run(piece); _copy_style(nr, r0)
-                cur = nxt
+    # 處理所有表格
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for para in cell.paragraphs:
+                    full_text = ''.join(run.text for run in para.runs)
+                    replaced = False
+                    for key, value in info.items():
+                        placeholder = f'{{{key}}}'
+                        if placeholder in full_text:
+                            full_text = full_text.replace(placeholder, str(value))
+                            replaced = True
+                    if replaced:
+                        for run in para.runs:
+                            run.text = ''
+                            run.font.color.rgb = RGBColor(0, 0, 0)
+                        para.runs[0].text = full_text
     return doc
+
+# from docx.shared import RGBColor
+
+# BLACK = RGBColor(0, 0, 0)
+
+# def _all_paras(doc):
+#     for p in doc.paragraphs: yield p
+#     for t in doc.tables:
+#         for r in t.rows:
+#             for c in r.cells:
+#                 for p in c.paragraphs: yield p
+#                 for tt in c.tables:
+#                     for rr in tt.rows:
+#                         for cc in rr.cells:
+#                             for p in cc.paragraphs: yield p
+
+# def _copy_style(dst, src):
+#     if src._element.rPr is not None:
+#         dst._element.rPr = src._element.rPr
+
+# def write_doc(doc, mapping, force_black=True):
+#     # mapping 例： {"{name}": "王小姐", "{date}": "2025/09/24"}
+#     items = sorted(mapping.items(), key=lambda kv: len(kv[0]), reverse=True)
+#     for para in _all_paras(doc):
+#         runs = list(para.runs)
+#         if not runs: continue
+#         spans, s = [], 0
+#         full = "".join(r.text for r in runs)
+#         if not full: continue
+#         for r in runs:
+#             e = s + len(r.text); spans.append((s, e, r)); s = e
+
+#         # 找所有匹配（避免重疊）
+#         occ = [False]*len(full); hits = []
+#         for ph, val in items:
+#             start = 0; L = len(ph)
+#             while True:
+#                 i = full.find(ph, start)
+#                 if i < 0: break
+#                 j = i + L
+#                 if all(not occ[k] for k in range(i, j)):
+#                     hits.append((i, j, str(val)))
+#                     for k in range(i, j): occ[k] = True
+#                 start = j
+#         if not hits: continue
+#         hits.sort()
+
+#         # 清空並重建
+#         for r in para.runs: r.text = ""
+#         while para.runs: para._element.remove(para.runs[0]._element)
+
+#         cur = 0; h = 0
+#         while cur < len(full):
+#             if h < len(hits) and cur == hits[h][0]:
+#                 a,b,val = hits[h]
+#                 # 取樣式來源：placeholder 起點所屬 run
+#                 base = next(r for (s,e,r) in spans if s < a < e or s == a)
+#                 nr = para.add_run(val); _copy_style(nr, base)
+#                 if force_black: nr.font.color.rgb = BLACK
+#                 cur = b; h += 1
+#             else:
+#                 nxt = hits[h][0] if h < len(hits) else len(full)
+#                 for s,e,r0 in spans:
+#                     if e <= cur or s >= nxt: continue
+#                     piece = full[max(s,cur):min(e,nxt)]
+#                     if piece:
+#                         nr = para.add_run(piece); _copy_style(nr, r0)
+#                 cur = nxt
+#     return doc
 
 def create_zip(file_dict):
     # file_dict: {"檔名.txt": b"檔案內容", ...}
@@ -152,6 +156,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
