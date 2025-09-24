@@ -43,42 +43,73 @@ from docx.shared import RGBColor
 #                         para.runs[0].text = full_text
 #     return doc
 
-def iter_paragraphs(doc):
-    """遍歷整份文件的所有段落（含表格、巢狀表格）。"""
-    for p in doc.paragraphs:
-        yield p
-    for table in doc.tables:
-        for row in table.rows:
-            for cell in row.cells:
-                for p in cell.paragraphs:
-                    yield p
-                # 巢狀表格
-                for sub_table in cell.tables:
-                    for r in sub_table.rows:
-                        for c in r.cells:
-                            for p in c.paragraphs:
-                                yield p
+from docx.shared import RGBColor
 
-def write_doc(doc, info, force_black=True):
-    """
-    在 run 層級做取代，保留原本樣式；若 force_black=True，凡有替換到的 run 一律改成黑色。
-    info 例如：{"name": "王小姐", "date": "2025/09/24"}
-    """
-    mapping = {f"{{{k}}}": str(v) for k, v in info.items()}
+BLACK = RGBColor(0, 0, 0)
 
-    for para in iter_paragraphs(doc):
-        for run in para.runs:
-            original = run.text
-            new_text = original
-            hit = False
-            for ph, val in mapping.items():
-                if ph in new_text:
-                    new_text = new_text.replace(ph, val)
-                    hit = True
-            if hit:
-                run.text = new_text
-                if force_black:
-                    run.font.color.rgb = RGBColor(0, 0, 0)  # 強制黑色
+def _all_paras(doc):
+    for p in doc.paragraphs: yield p
+    for t in doc.tables:
+        for r in t.rows:
+            for c in r.cells:
+                for p in c.paragraphs: yield p
+                for tt in c.tables:
+                    for rr in tt.rows:
+                        for cc in rr.cells:
+                            for p in cc.paragraphs: yield p
+
+def _copy_style(dst, src):
+    if src._element.rPr is not None:
+        dst._element.rPr = src._element.rPr
+
+def write_doc(doc, mapping, force_black=True):
+    # mapping 例： {"{name}": "王小姐", "{date}": "2025/09/24"}
+    items = sorted(mapping.items(), key=lambda kv: len(kv[0]), reverse=True)
+    for para in _all_paras(doc):
+        runs = list(para.runs)
+        if not runs: continue
+        spans, s = [], 0
+        full = "".join(r.text for r in runs)
+        if not full: continue
+        for r in runs:
+            e = s + len(r.text); spans.append((s, e, r)); s = e
+
+        # 找所有匹配（避免重疊）
+        occ = [False]*len(full); hits = []
+        for ph, val in items:
+            start = 0; L = len(ph)
+            while True:
+                i = full.find(ph, start)
+                if i < 0: break
+                j = i + L
+                if all(not occ[k] for k in range(i, j)):
+                    hits.append((i, j, str(val)))
+                    for k in range(i, j): occ[k] = True
+                start = j
+        if not hits: continue
+        hits.sort()
+
+        # 清空並重建
+        for r in para.runs: r.text = ""
+        while para.runs: para._element.remove(para.runs[0]._element)
+
+        cur = 0; h = 0
+        while cur < len(full):
+            if h < len(hits) and cur == hits[h][0]:
+                a,b,val = hits[h]
+                # 取樣式來源：placeholder 起點所屬 run
+                base = next(r for (s,e,r) in spans if s < a < e or s == a)
+                nr = para.add_run(val); _copy_style(nr, base)
+                if force_black: nr.font.color.rgb = BLACK
+                cur = b; h += 1
+            else:
+                nxt = hits[h][0] if h < len(hits) else len(full)
+                for s,e,r0 in spans:
+                    if e <= cur or s >= nxt: continue
+                    piece = full[max(s,cur):min(e,nxt)]
+                    if piece:
+                        nr = para.add_run(piece); _copy_style(nr, r0)
+                cur = nxt
     return doc
 
 def create_zip(file_dict):
@@ -121,6 +152,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
