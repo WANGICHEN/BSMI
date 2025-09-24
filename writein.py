@@ -62,7 +62,7 @@ def run_BSMI_doc(info):
          "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"]
     
     for f in fs:
-        download_url = share_url + ("&download=1" if "?" in share_url else "?download=1")
+        download_url = f + ("&download=1" if "?" in f else "?download=1")
             
         headers = {"User-Agent": "Mozilla/5.0"}
         r = requests.get(download_url, headers=headers, allow_redirects=True, timeout=30)
@@ -78,3 +78,4 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
