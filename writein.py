@@ -64,6 +64,9 @@ def run_BSMI_doc(info):
          ["外箱標示.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"]]
     
     for f_name, f in fs:
+        information = info.copy()
+        if f_name in ["00_08.docx"]:
+            information["series"] = ", " + information["series"]
         download_url = f + ("&download=1" if "?" in f else "?download=1")
             
         headers = {"User-Agent": "Mozilla/5.0"}
@@ -80,6 +83,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
