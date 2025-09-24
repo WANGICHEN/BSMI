@@ -73,7 +73,7 @@ def run_BSMI_doc(info):
         r = requests.get(download_url, headers=headers, allow_redirects=True, timeout=30)
         r.raise_for_status()  # 403/404 會在這裡丟錯
         
-        doc = write_doc(Document(BytesIO(r.content)), info)
+        doc = write_doc(Document(BytesIO(r.content)), information)
         buf = io.BytesIO()
         doc.save(buf)
         buf.seek(0)
@@ -83,6 +83,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
