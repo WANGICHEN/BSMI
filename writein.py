@@ -18,7 +18,8 @@ def write_doc(doc, info):
                 full_text = full_text.replace(placeholder, str(value))
                 replaced = True
         if replaced:
-            style_ref = para.runs[0]
+            # 先留住樣式（可能是 None）
+            style_rPr = para.runs[0]._element.rPr if para.runs else None
             # 清空原有 runs
             for run in para.runs:
                 run.text = ''
@@ -167,6 +168,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
