@@ -3,6 +3,7 @@ from glob import glob
 import zipfile
 import io
 import os
+import requests
 from docx.shared import RGBColor
 
 def write_doc(doc, info):
@@ -78,4 +79,5 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
