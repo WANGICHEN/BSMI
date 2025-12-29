@@ -100,7 +100,7 @@ def _copy_rpr(dst_run, src_run):
         el.remove(el.rPr)
     el.insert(0, deepcopy(src))
 
-def write_doc(doc, mapping, force_black=True, prefer="first"):
+def write_doc(doc, mapping, name, force_black=True, prefer="first"):
     """
     mapping: 例如 {"{name}": "王小姐", "{date}": "2025/09/24"}
     force_black: True=替換文字設為黑色；False=沿用來源樣式顏色
@@ -243,9 +243,9 @@ def write_doc(doc, mapping, force_black=True, prefer="first"):
         if force_black:
             for r in runs:
                 r.font.color.rgb = BLACK
-                
-    for table in doc.tables:
-        remove_inside_vertical_borders(table)
+    if name == "02_01.docx":          
+        for table in doc.tables:
+            remove_inside_vertical_borders(table)
     return doc
     
 def create_zip(file_dict):
@@ -283,7 +283,7 @@ def run_BSMI_doc(info):
         # r.raise_for_status()  # 403/404 會在這裡丟錯
         # doc = write_doc(Document(BytesIO(r.content)), information)
 
-        doc = write_doc(Document(f), information)
+        doc = write_doc(Document(f), information, f_name)
         
         buf = io.BytesIO()
         doc.save(buf)
@@ -294,6 +294,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
