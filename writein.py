@@ -7,7 +7,28 @@ from copy import deepcopy
 import requests
 from io import BytesIO 
 from docx.shared import RGBColor
+from docx.oxml import OxmlElement, ns
 
+def remove_inside_vertical_borders(table):
+    tbl = table._tbl
+    tblPr = tbl.tblPr
+    if tblPr is None:
+        tblPr = OxmlElement('w:tblPr')
+        tbl.append(tblPr)
+
+    tblBorders = tblPr.find(ns.qn('w:tblBorders'))
+    if tblBorders is None:
+        tblBorders = OxmlElement('w:tblBorders')
+        tblPr.append(tblBorders)
+
+    insideV = tblBorders.find(ns.qn('w:insideV'))
+    if insideV is None:
+        insideV = OxmlElement('w:insideV')
+        tblBorders.append(insideV)
+
+    # 設為 none = 關閉垂直內框線
+    insideV.set(ns.qn('w:val'), 'none')
+    
 # def write_doc(doc, info):
 
 #     for para in doc.paragraphs:
@@ -222,6 +243,9 @@ def write_doc(doc, mapping, force_black=True, prefer="first"):
         if force_black:
             for r in runs:
                 r.font.color.rgb = BLACK
+                
+    for table in doc.tables:
+        remove_inside_vertical_borders(table)
     return doc
     
 def create_zip(file_dict):
@@ -270,6 +294,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
