@@ -86,6 +86,71 @@ def write_doc(doc, mapping, force_black=True, prefer="first"):
     prefer: "first"=沿用 placeholder 起點 run 樣式；"last"=沿用終點 run 樣式
     """
     # 先長字串優先，避免互相覆蓋
+    # items = sorted(mapping.items(), key=lambda kv: len(kv[0]), reverse=True)
+
+    # for para in _all_paras(doc):
+    #     runs = list(para.runs)
+    #     if not runs:
+    #         continue
+
+    #     # 攤平成整段文字與 run 對應區間
+    #     full = "".join(r.text for r in runs)
+    #     if not full:
+    #         continue
+    #     spans, s = [], 0
+    #     for r in runs:
+    #         e = s + len(r.text)
+    #         spans.append((s, e, r))
+    #         s = e
+
+    #     # 找不重疊的所有匹配
+    #     used = [False] * len(full)
+    #     hits = []  # (start, end, value, base_run)
+    #     for ph, val in items:
+    #         i, L = 0, len(ph)
+    #         while True:
+    #             j = full.find(ph, i)
+    #             if j < 0:
+    #                 break
+    #             k = j + L
+    #             if all(not used[t] for t in range(j, k)):
+    #                 involved = [r for (a, b, r) in spans if not (b <= j or a >= k)]
+    #                 base = involved[0] if prefer == "first" else involved[-1]
+    #                 hits.append((j, k, str(val), base))
+    #                 for t in range(j, k):
+    #                     used[t] = True
+    #             i = k
+    #     if not hits:
+    #         continue
+    #     hits.sort(key=lambda x: x[0])
+
+    #     # 清空並依序重建（替換片段→新 run；其他片段→按原 run 切片重建）
+    #     for r in para.runs:
+    #         r.text = ""
+    #     while para.runs:
+    #         para._element.remove(para.runs[0]._element)
+
+    #     cur, h = 0, 0
+    #     while cur < len(full):
+    #         if h < len(hits) and cur == hits[h][0]:
+    #             a, b, val, base = hits[h]
+    #             nr = para.add_run(val)
+    #             _copy_rpr(nr, base)
+    #             if force_black:
+    #                 nr.font.color.rgb = BLACK
+    #             cur = b
+    #             h += 1
+    #         else:
+    #             nxt = hits[h][0] if h < len(hits) else len(full)
+    #             for a, b, r0 in spans:
+    #                 if b <= cur or a >= nxt:
+    #                     continue
+    #                 piece = full[max(a, cur):min(b, nxt)]
+    #                 if piece:
+    #                     nr = para.add_run(piece)
+    #                     _copy_rpr(nr, r0)
+    #             cur = nxt
+
     items = sorted(mapping.items(), key=lambda kv: len(kv[0]), reverse=True)
 
     for para in _all_paras(doc):
@@ -124,32 +189,39 @@ def write_doc(doc, mapping, force_black=True, prefer="first"):
             continue
         hits.sort(key=lambda x: x[0])
 
-        # 清空並依序重建（替換片段→新 run；其他片段→按原 run 切片重建）
-        for r in para.runs:
-            r.text = ""
-        while para.runs:
-            para._element.remove(para.runs[0]._element)
+        # 生成 new_full（只改文字，不動 run 結構）
+        parts = []
+        cur = 0
+        for a, b, val, _base in hits:
+            if cur < a:
+                parts.append(full[cur:a])
+            parts.append(val)
+            cur = b
+        if cur < len(full):
+            parts.append(full[cur:])
+        new_full = "".join(parts)
 
-        cur, h = 0, 0
-        while cur < len(full):
-            if h < len(hits) and cur == hits[h][0]:
-                a, b, val, base = hits[h]
-                nr = para.add_run(val)
-                _copy_rpr(nr, base)
-                if force_black:
-                    nr.font.color.rgb = BLACK
-                cur = b
-                h += 1
+        if new_full == full:
+            return False
+
+        # 將 new_full 分配回原 runs：
+        # 1) 先取得各 run 原本長度
+        orig_lens = [len(r.text) for r in runs]
+
+        # 2) 逐 run 填回；最後一個 run 承接剩餘（避免新增 run）
+        pos = 0
+        for idx, (r, L) in enumerate(zip(runs, orig_lens)):
+            if idx < len(runs) - 1:
+                r.text = new_full[pos:pos + L]
+                pos += L
             else:
-                nxt = hits[h][0] if h < len(hits) else len(full)
-                for a, b, r0 in spans:
-                    if b <= cur or a >= nxt:
-                        continue
-                    piece = full[max(a, cur):min(b, nxt)]
-                    if piece:
-                        nr = para.add_run(piece)
-                        _copy_rpr(nr, r0)
-                cur = nxt
+                r.text = new_full[pos:]  # 最後一個吃剩下全部
+
+        # 3) 若你需要 force_black：只能「統一整段」或「只改特定 run」
+        #    這裡採最安全策略：整段所有 runs 都變黑（避免新增 run）
+        if force_black:
+            for r in runs:
+                r.font.color.rgb = BLACK
     return doc
     
 def create_zip(file_dict):
@@ -192,6 +264,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
