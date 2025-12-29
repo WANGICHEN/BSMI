@@ -238,23 +238,29 @@ def create_zip(file_dict):
 def run_BSMI_doc(info):
     print("run BSMI doc")
     files = {}
-    fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EddnQOquWcRFnEg7TWvy2r0BPAxZon_0AgUEMR8wygTOfA?e=llylt7"],
-         ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EZRXXI9yXRhJuZ1o1WV1iOIBAeD36nOTZe5Ojo5hl7hpmw?e=aKc3ZZ"],
-         ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EQk0sg6ngDxHhPE0pO894Q4BZnkPKc0Y1qYehDwvYPQCdQ?e=leuclc"],
-         ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/Ea3dOFrVSFlMtLBljbBtW4oBfJO9g7z8xY8pWIOhA5H-gg?e=V0i1zO"],
-         ["外箱標示.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"]]
-    
+    # fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EddnQOquWcRFnEg7TWvy2r0BPAxZon_0AgUEMR8wygTOfA?e=llylt7"],
+    #      ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EZRXXI9yXRhJuZ1o1WV1iOIBAeD36nOTZe5Ojo5hl7hpmw?e=aKc3ZZ"],
+    #      ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EQk0sg6ngDxHhPE0pO894Q4BZnkPKc0Y1qYehDwvYPQCdQ?e=leuclc"],
+    #      ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/Ea3dOFrVSFlMtLBljbBtW4oBfJO9g7z8xY8pWIOhA5H-gg?e=V0i1zO"],
+    #      ["外箱標示.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"]]
+    fs = [["00_08.docx", "BSMI用印文件/00_08 委任授權書-114年更正版- (一般案件).docx"],
+         ["00_99.docx", "BSMI用印文件/00_99 其他 (B to B的經營模式聲明書).docx"],
+         ["02_01.docx", "BSMI用印文件/02_01 安規預審單及缺失補正說明.docx"],
+         ["07_01.docx", "BSMI用印文件/07_01 限用物質含有情況標示聲明書.docx"],
+         ["外箱標示.docx", "BSMI用印文件/外箱標示示意圖.docx"]]    
     for f_name, f in fs:
         information = info.copy()
         if f_name in ["00_08.docx", "外箱標示.docx", "02_01.docx"]:
             information["{series}"] = ", " + information["{series}"]
-        download_url = f + ("&download=1" if "?" in f else "?download=1")
+        # download_url = f + ("&download=1" if "?" in f else "?download=1")
             
-        headers = {"User-Agent": "Mozilla/5.0"}
-        r = requests.get(download_url, headers=headers, allow_redirects=True, timeout=30)
-        r.raise_for_status()  # 403/404 會在這裡丟錯
+        # headers = {"User-Agent": "Mozilla/5.0"}
+        # r = requests.get(download_url, headers=headers, allow_redirects=True, timeout=30)
+        # r.raise_for_status()  # 403/404 會在這裡丟錯
+        # doc = write_doc(Document(BytesIO(r.content)), information)
+
+        doc = write_doc(Document(f), information)
         
-        doc = write_doc(Document(BytesIO(r.content)), information)
         buf = io.BytesIO()
         doc.save(buf)
         buf.seek(0)
@@ -264,6 +270,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
