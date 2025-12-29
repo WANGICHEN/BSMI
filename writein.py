@@ -262,6 +262,10 @@ def style_setting(doc):
     style.font.name = 'Times New Roman'
     style._element.rPr.rFonts.set(qn('w:eastAsia'), "標楷體")
     # style.font.size = Pt(11)
+    rFonts.set(qn('w:ascii'), 'Times New Roman')
+    rFonts.set(qn('w:hAnsi'), 'Times New Roman')
+    rFonts.set(qn('w:eastAsia'), '標楷體')
+    rFonts.set(qn('w:cs'), 'Times New Roman')
 
 
 
@@ -299,6 +303,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
