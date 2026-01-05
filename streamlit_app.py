@@ -1,5 +1,5 @@
 import streamlit as st
-import writein
+# import writein
 
 st.title("BSMI 用印文件")
 
@@ -63,6 +63,7 @@ if submitted:
         file_name="results.zip",
 
         mime="application/zip")
+
 
 
 
