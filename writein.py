@@ -7,7 +7,11 @@ from copy import deepcopy
 import requests
 from io import BytesIO 
 from docx.shared import RGBColor
+import table_format
 
+
+
+BLACK = RGBColor(0, 0, 0)
 
 def _all_paras(doc):
     for p in doc.paragraphs: 
@@ -40,7 +44,6 @@ def write_doc(doc, mapping, force_black=True, prefer="first"):
     prefer: "first"=沿用 placeholder 起點 run 樣式；"last"=沿用終點 run 樣式
     """
     # # 先長字串優先，避免互相覆蓋
-    BLACK = RGBColor(0, 0, 0)
     items = sorted(mapping.items(), key=lambda kv: len(kv[0]), reverse=True)
 
     for para in _all_paras(doc):
@@ -112,6 +115,8 @@ def write_doc(doc, mapping, force_black=True, prefer="first"):
         if force_black:
             for r in runs:
                 r.font.color.rgb = BLACK
+
+
     return doc
     
 def create_zip(file_dict):
@@ -123,41 +128,39 @@ def create_zip(file_dict):
     buffer.seek(0)
     return buffer
 
-
-
 def run_BSMI_doc(info):
+    print("run BSMI doc")
     files = {}
-    fs = [
-        ["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EddnQOquWcRFnEg7TWvy2r0BPAxZon_0AgUEMR8wygTOfA?e=llylt7"],
-        ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EZRXXI9yXRhJuZ1o1WV1iOIBAeD36nOTZe5Ojo5hl7hpmw?e=aKc3ZZ"],
-        ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EQk0sg6ngDxHhPE0pO894Q4BZnkPKc0Y1qYehDwvYPQCdQ?e=leuclc"],
-        ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/Ea3dOFrVSFlMtLBljbBtW4oBfJO9g7z8xY8pWIOhA5H-gg?e=V0i1zO"],
-        ["外箱標示.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"],
-    ]
+    fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EddnQOquWcRFnEg7TWvy2r0BPAxZon_0AgUEMR8wygTOfA?e=llylt7"],
+         ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQD8OaacyRyKSK2zV3fSJRaYARSDVysOP3VNWkiGrMyo8EA?e=Wtuyjb"],
+         ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EQk0sg6ngDxHhPE0pO894Q4BZnkPKc0Y1qYehDwvYPQCdQ?e=leuclc"],
+         ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/Ea3dOFrVSFlMtLBljbBtW4oBfJO9g7z8xY8pWIOhA5H-gg?e=V0i1zO"],
+         ["外箱標示.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"]]
+
     for f_name, f in fs:
         information = info.copy()
         if f_name in ["00_08.docx", "外箱標示.docx", "02_01.docx"]:
             information["{series}"] = ", " + information["{series}"]
         download_url = f + ("&download=1" if "?" in f else "?download=1")
+
+
+
         headers = {"User-Agent": "Mozilla/5.0"}
         r = requests.get(download_url, headers=headers, allow_redirects=True, timeout=30)
         r.raise_for_status()  # 403/404 會在這裡丟錯
-    
+
         doc = write_doc(Document(BytesIO(r.content)), information)
+        doc = table_format.set_format(f_name, doc)
         buf = io.BytesIO()
         doc.save(buf)
         buf.seek(0)
         files[f_name] = buf.read()
-        
+
+
     zip_buffer = create_zip(files)
 
 
     return zip_buffer
-
-
-
-
-
 
 
 
