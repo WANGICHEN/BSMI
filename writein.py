@@ -126,7 +126,6 @@ def create_zip(file_dict):
 
 
 def run_BSMI_doc(info):
-    print("run BSMI doc")
     files = {}
     fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EddnQOquWcRFnEg7TWvy2r0BPAxZon_0AgUEMR8wygTOfA?e=llylt7"],
           ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EZRXXI9yXRhJuZ1o1WV1iOIBAeD36nOTZe5Ojo5hl7hpmw?e=aKc3ZZ"],
@@ -139,9 +138,6 @@ def run_BSMI_doc(info):
         if f_name in ["00_08.docx", "外箱標示.docx", "02_01.docx"]:
             information["{series}"] = ", " + information["{series}"]
         download_url = f + ("&download=1" if "?" in f else "?download=1")
-    
-    
-    
         headers = {"User-Agent": "Mozilla/5.0"}
         r = requests.get(download_url, headers=headers, allow_redirects=True, timeout=30)
         r.raise_for_status()  # 403/404 會在這裡丟錯
@@ -151,20 +147,12 @@ def run_BSMI_doc(info):
         doc.save(buf)
         buf.seek(0)
         files[f_name] = buf.read()
-
-
-    # information = info.copy()
-    # doc = write_doc(
-    #     Document(r'C:\Users\USER\Desktop\CDF-document-main\BSMI-main\BSMI用印文件\07_01 限用物質含有情況標示聲明書.docx'),
-    #     information)
-    # buf = io.BytesIO()
-    # doc.save(buf)
-    # buf.seek(0)
-    # files['00_99.docx'] = buf.read()
+        
     zip_buffer = create_zip(files)
 
 
     return zip_buffer
+
 
 
 
