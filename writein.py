@@ -8,52 +8,6 @@ import requests
 from io import BytesIO 
 from docx.shared import RGBColor
 
-# def write_doc(doc, info):
-
-#     for para in doc.paragraphs:
-#     #     full_text = ''.join(run.text for run in para.runs)
-#     #     replaced = False
-#     #     for key, value in info.items():
-#     #         placeholder = f'{{{key}}}'
-#     #         if placeholder in full_text:
-#     #             full_text = full_text.replace(placeholder, str(value))
-#         #         replaced = True
-#         # if replaced: 
-#         #     # 清空原有 runs 我這樣的寫法可以怎麼改 
-#         #     for run in para.runs: 
-#         #         run.text = '' 
-#         #         # 只用一個 run 填回去 
-#         #     para.runs[0].text = full_text
-#         for run in para.runs:
-#             for key, value in info.items():
-#                 placeholder = f'{{{key}}}'
-#                 if placeholder in run.text:
-#                     run.text = run.text.replace(placeholder, str(value))
-#                     run.font.color.rgb = RGBColor(0, 0, 0)  # 可強制黑色
-    
-#     # 處理所有表格
-#     for table in doc.tables:
-#         for row in table.rows:
-#             for cell in row.cells:
-#                 for para in cell.paragraphs:
-#                     full_text = ''.join(run.text for run in para.runs)
-#                     replaced = False
-#                     for key, value in info.items():
-#                         placeholder = f'{{{key}}}'
-#                         if placeholder in full_text:
-#                             full_text = full_text.replace(placeholder, str(value))
-#                             replaced = True
-#                     if replaced:
-#                         for run in para.runs:
-#                             run.text = ''
-#                             run.font.color.rgb = RGBColor(0, 0, 0)
-#                         para.runs[0].text = full_text
-#     return doc
-
-from copy import deepcopy
-from docx.shared import RGBColor
-
-
 
 def _all_paras(doc):
     for p in doc.paragraphs: 
@@ -158,8 +112,6 @@ def write_doc(doc, mapping, force_black=True, prefer="first"):
         if force_black:
             for r in runs:
                 r.font.color.rgb = BLACK
-
-
     return doc
     
 def create_zip(file_dict):
@@ -176,43 +128,44 @@ def create_zip(file_dict):
 def run_BSMI_doc(info):
     print("run BSMI doc")
     files = {}
-    # fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EddnQOquWcRFnEg7TWvy2r0BPAxZon_0AgUEMR8wygTOfA?e=llylt7"],
-    #      ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EZRXXI9yXRhJuZ1o1WV1iOIBAeD36nOTZe5Ojo5hl7hpmw?e=aKc3ZZ"],
-    #      ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EQk0sg6ngDxHhPE0pO894Q4BZnkPKc0Y1qYehDwvYPQCdQ?e=leuclc"],
-    #      ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/Ea3dOFrVSFlMtLBljbBtW4oBfJO9g7z8xY8pWIOhA5H-gg?e=V0i1zO"],
-    #      ["外箱標示.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"]]
-    #
-    # for f_name, f in fs:
-    #     information = info.copy()
-    #     if f_name in ["00_08.docx", "外箱標示.docx", "02_01.docx"]:
-    #         information["{series}"] = ", " + information["{series}"]
-    #     download_url = f + ("&download=1" if "?" in f else "?download=1")
-    #
-    #
-    #
-    #     headers = {"User-Agent": "Mozilla/5.0"}
-    #     r = requests.get(download_url, headers=headers, allow_redirects=True, timeout=30)
-    #     r.raise_for_status()  # 403/404 會在這裡丟錯
-    #
-    #     doc = write_doc(Document(BytesIO(r.content)), information)
-        # buf = io.BytesIO()
-        # doc.save(buf)
-        # buf.seek(0)
-        # files[f_name] = buf.read()
+    fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EddnQOquWcRFnEg7TWvy2r0BPAxZon_0AgUEMR8wygTOfA?e=llylt7"],
+         ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EZRXXI9yXRhJuZ1o1WV1iOIBAeD36nOTZe5Ojo5hl7hpmw?e=aKc3ZZ"],
+         ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EQk0sg6ngDxHhPE0pO894Q4BZnkPKc0Y1qYehDwvYPQCdQ?e=leuclc"],
+         ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/Ea3dOFrVSFlMtLBljbBtW4oBfJO9g7z8xY8pWIOhA5H-gg?e=V0i1zO"],
+         ["外箱標示.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"]]
+    
+    for f_name, f in fs:
+        information = info.copy()
+        if f_name in ["00_08.docx", "外箱標示.docx", "02_01.docx"]:
+            information["{series}"] = ", " + information["{series}"]
+        download_url = f + ("&download=1" if "?" in f else "?download=1")
+    
+    
+    
+        headers = {"User-Agent": "Mozilla/5.0"}
+        r = requests.get(download_url, headers=headers, allow_redirects=True, timeout=30)
+        r.raise_for_status()  # 403/404 會在這裡丟錯
+    
+        doc = write_doc(Document(BytesIO(r.content)), information)
+        buf = io.BytesIO()
+        doc.save(buf)
+        buf.seek(0)
+        files[f_name] = buf.read()
 
 
-    information = info.copy()
-    doc = write_doc(
-        Document(r'C:\Users\USER\Desktop\CDF-document-main\BSMI-main\BSMI用印文件\07_01 限用物質含有情況標示聲明書.docx'),
-        information)
-    buf = io.BytesIO()
-    doc.save(buf)
-    buf.seek(0)
-    files['00_99.docx'] = buf.read()
+    # information = info.copy()
+    # doc = write_doc(
+    #     Document(r'C:\Users\USER\Desktop\CDF-document-main\BSMI-main\BSMI用印文件\07_01 限用物質含有情況標示聲明書.docx'),
+    #     information)
+    # buf = io.BytesIO()
+    # doc.save(buf)
+    # buf.seek(0)
+    # files['00_99.docx'] = buf.read()
     zip_buffer = create_zip(files)
 
 
     return zip_buffer
+
 
 
 
