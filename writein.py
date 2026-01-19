@@ -131,10 +131,10 @@ def create_zip(file_dict):
 def run_BSMI_doc(info):
     print("run BSMI doc")
     files = {}
-    fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EddnQOquWcRFnEg7TWvy2r0BPAxZon_0AgUEMR8wygTOfA?e=llylt7"],
-         ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQD8OaacyRyKSK2zV3fSJRaYARSDVysOP3VNWkiGrMyo8EA?e=Wtuyjb"],
-         ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/EQk0sg6ngDxHhPE0pO894Q4BZnkPKc0Y1qYehDwvYPQCdQ?e=leuclc"],
-         ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/Ea3dOFrVSFlMtLBljbBtW4oBfJO9g7z8xY8pWIOhA5H-gg?e=V0i1zO"],
+    fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQDXZ0DqrlnERZxIO01r8tq9ATwMWaJ_9AIFBDEfMMoEznw?e=1cQV5r"],
+         ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQD8OaacyRyKSK2zV3fSJRaYARSDVysOP3VNWkiGrMyo8EA?e=7qF9ol"],
+         ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQAJNLIOp4A8R4TxNKTvPeEOAWZ5DynNGNamHoQ8L2D0AnU?e=ObRJqm"],
+          ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/Ea3dOFrVSFlMtLBljbBtW4oBfJO9g7z8xY8pWIOhA5H-gg?e=V0i1zO"],
          ["外箱標示.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/ESYvqMkqG9NBlqzSQJQHLWgB9NoCWQLJiPWm-lYVU_pEbQ?e=EeMRfu"]]
 
     for f_name, f in fs:
@@ -161,6 +161,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
