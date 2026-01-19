@@ -131,7 +131,7 @@ def create_zip(file_dict):
 def run_BSMI_doc(info):
     print("run BSMI doc")
     files = {}
-    fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQAJNLIOp4A8R4TxNKTvPeEOAWZ5DynNGNamHoQ8L2D0AnU?e=B1my9Q"],
+    fs = [["00_08.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQDXZ0DqrlnERZxIO01r8tq9ATwMWaJ_9AIFBDEfMMoEznw?e=8VRKis"],
          ["00_99.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQD8OaacyRyKSK2zV3fSJRaYARSDVysOP3VNWkiGrMyo8EA?e=YcdpwT"],
          ["02_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQAJNLIOp4A8R4TxNKTvPeEOAWZ5DynNGNamHoQ8L2D0AnU?e=5uweBG"],
          ["07_01.docx", "https://z28856673-my.sharepoint.com/:w:/g/personal/itek_project_i-tek_com_tw/IQAClYH5s1IwRZ53rdymbHgnAXi7rDTqgM8mCeMYs7rCpv8?e=1jofbd"],
@@ -160,6 +160,7 @@ def run_BSMI_doc(info):
 
 
     return zip_buffer
+
 
 
 
